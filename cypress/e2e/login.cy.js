@@ -48,3 +48,69 @@ describe('Login — Failure Scenarios', () => {
   })
 
 })
+
+describe('Login — Success Flow', () => {
+
+  beforeEach(() => {
+    cy.visit('/')
+  })
+
+  it('logs in with valid credentials', () => {
+    cy.get('[data-test="username"]')
+      .type('standard_user')
+    cy.get('[data-test="password"]')
+      .type('secret_sauce')
+    cy.get('[data-test="login-button"]').click()
+
+    // After login, URL should change to /inventory.html
+    cy.url().should('include', '/inventory.html')
+  })
+
+  it('shows the inventory page header after login', () => {
+    cy.get('[data-test="username"]')
+      .type('standard_user')
+    cy.get('[data-test="password"]')
+      .type('secret_sauce')
+    cy.get('[data-test="login-button"]').click()
+
+    cy.get('.title')
+      .should('be.visible')
+      .and('contain', 'Products')
+  })
+
+  it('homepage shows product list after login', () => {
+    cy.get('[data-test="username"]')
+      .type('standard_user')
+    cy.get('[data-test="password"]')
+      .type('secret_sauce')
+    cy.get('[data-test="login-button"]').click()
+
+    cy.get('.inventory_list')
+      .should('be.visible')
+    cy.get('.inventory_item')
+      .should('have.length.greaterThan', 0)
+  })
+
+  it('shows shopping cart icon after login', () => {
+    cy.get('[data-test="username"]')
+      .type('standard_user')
+    cy.get('[data-test="password"]')
+      .type('secret_sauce')
+    cy.get('[data-test="login-button"]').click()
+
+    cy.get('.shopping_cart_link')
+      .should('be.visible')
+  })
+
+  it('hamburger menu is accessible after login', () => {
+    cy.get('[data-test="username"]')
+      .type('standard_user')
+    cy.get('[data-test="password"]')
+      .type('secret_sauce')
+    cy.get('[data-test="login-button"]').click()
+
+    cy.get('#react-burger-menu-btn')
+      .should('be.visible')
+  })
+
+})
