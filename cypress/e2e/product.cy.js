@@ -1,14 +1,12 @@
 import InventoryPage from '../pages/InventoryPage'
-import LoginPage from '../pages/LoginPage'
 import ProductPage from '../pages/ProductPage'
 
-describe('Product Detail Page — with POM', () => {
+describe('Product Detail Page', () => {
 
   beforeEach(() => {
-    LoginPage.visit()
-    LoginPage.login('standard_user', 'secret_sauce')
-    InventoryPage.shouldBeVisible()
-    InventoryPage.clickProductByIndex(0)
+    cy.loginAsStandardUser()
+    cy.verifyOnInventoryPage()
+    cy.goToProduct(0)
     ProductPage.shouldBeVisible()
   })
 
@@ -24,8 +22,19 @@ describe('Product Detail Page — with POM', () => {
     ProductPage.shouldShowDescription()
   })
 
+  it('shows product image', () => {
+    ProductPage.productImage
+      .should('be.visible')
+      .and('have.attr', 'src')
+  })
+
+  it('Add to Cart button works', () => {
+    ProductPage.addToCart()
+    cy.verifyCartCount(1)
+  })
+
   it('back button returns to inventory', () => {
-    ProductPage.goBack()
+    cy.goBackToInventory()
     InventoryPage.shouldBeVisible()
   })
 

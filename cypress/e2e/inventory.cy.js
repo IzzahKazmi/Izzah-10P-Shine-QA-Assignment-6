@@ -1,15 +1,13 @@
 import InventoryPage from '../pages/InventoryPage'
-import LoginPage from '../pages/LoginPage'
 
-describe('Inventory Page — with POM', () => {
+describe('Inventory Page', () => {
 
   beforeEach(() => {
-    LoginPage.visit()
-    LoginPage.login('standard_user', 'secret_sauce')
-    InventoryPage.shouldBeVisible()
+    cy.loginAsStandardUser()
+    cy.verifyOnInventoryPage()
   })
 
-  it('shows 6 products', () => {
+  it('displays exactly 6 products', () => {
     InventoryPage.shouldHaveProductCount(6)
   })
 
@@ -23,14 +21,42 @@ describe('Inventory Page — with POM', () => {
     })
   })
 
-  it('sorts products by price low to high', () => {
+  it('each product has a price', () => {
+    InventoryPage.productPrices.each(($el) => {
+      cy.wrap($el)
+        .invoke('text')
+        .should('match', /\$\d+\.\d{2}/)
+    })
+  })
+
+  it('each product has an Add to Cart button', () => {
+    InventoryPage.addToCartButtons
+      .should('have.length', 6)
+  })
+
+  it('sorts by price low to high', () => {
     InventoryPage.sortBy('lohi')
     InventoryPage.productPrices.then(($prices) => {
-      const vals = [...$prices].map(
+      const prices = [...$prices].map(
         el => parseFloat(el.innerText.replace('$',''))
       )
-      expect(vals).to.deep.equal([...vals].sort((a,b)=>a-b))
+      expect(prices).to.deep.equal(
+        [...prices].sort((a,b) => a - b)
+      )
     })
+  })
+
+  it('sorts by name A to Z', () => {
+    InventoryPage.sortBy('az')
+    InventoryPage.productNames.then(($names) => {
+      const names = [...$names].map(el => el.innerText)
+      expect(names).to.deep.equal([...names].sort())
+    })
+  })
+
+  it('can add first product to cart', () => {
+    cy.addFirstProductToCart()
+    cy.verifyCartCount(1)
   })
 
 })
